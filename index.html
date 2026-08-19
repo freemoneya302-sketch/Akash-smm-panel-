@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Akash SMM Panel</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+body{background:#f4f7fb;color:#172033}
+header{
+  background:linear-gradient(135deg,#6c5ce7,#4834d4);
+  color:white;padding:18px 20px;
+  display:flex;justify-content:space-between;align-items:center;
+  position:sticky;top:0;z-index:10
+}
+.logo{font-size:22px;font-weight:bold}
+.balance{
+  background:rgba(255,255,255,.18);
+  padding:9px 14px;border-radius:20px;font-weight:bold
+}
+.container{max-width:1100px;margin:auto;padding:20px}
+.hero{
+  background:linear-gradient(135deg,#6c5ce7,#8e7dff);
+  color:white;border-radius:22px;padding:28px;
+  margin-bottom:20px
+}
+.hero h1{font-size:30px;margin-bottom:8px}
+.hero p{opacity:.9}
+.grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:15px;margin:20px 0
+}
+.card{
+  background:white;padding:20px;border-radius:16px;
+  box-shadow:0 5px 20px rgba(0,0,0,.06)
+}
+.card h3{margin-bottom:8px}
+.stat{font-size:25px;font-weight:bold;color:#5b4bd8}
+.tabs{
+  display:flex;gap:8px;overflow:auto;margin-bottom:15px
+}
+.tabs button{
+  border:0;background:white;padding:12px 18px;border-radius:12px;
+  cursor:pointer;white-space:nowrap
+}
+.tabs button.active{background:#6c5ce7;color:white}
+.section{display:none}
+.section.active{display:block}
+.service{
+  background:white;border-radius:16px;padding:18px;margin-bottom:12px;
+  display:flex;justify-content:space-between;align-items:center;
+  gap:10px;box-shadow:0 4px 15px rgba(0,0,0,.05)
+}
+.service small{color:#777}
+.btn{
+  border:0;background:#6c5ce7;color:white;
+  padding:11px 17px;border-radius:10px;cursor:pointer
+}
+.btn.red{background:#e74c3c}
+.btn.green{background:#00b894}
+input,select{
+  width:100%;padding:13px;border:1px solid #ddd;
+  border-radius:10px;margin:8px 0 14px;outline:none
+}
+label{font-size:14px;font-weight:bold}
+.form{
+  background:white;padding:22px;border-radius:16px;
+  max-width:600px;box-shadow:0 5px 20px rgba(0,0,0,.06)
+}
+table{width:100%;border-collapse:collapse;background:white;border-radius:15px;overflow:hidden}
+th,td{padding:13px;text-align:left;border-bottom:1px solid #eee;font-size:14px}
+th{background:#f1efff}
+.badge{
+  padding:5px 9px;border-radius:15px;background:#e8fff7;color:#00a67d;
+  font-size:12px
+}
+.empty{text-align:center;padding:30px;color:#888}
+footer{text-align:center;padding:30px;color:#777}
+.modal{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);
+  justify-content:center;align-items:center;padding:20px;z-index:20
+}
+.modal-box{
+  background:white;border-radius:18px;padding:25px;width:100%;max-width:430px
+}
+.close{float:right;font-size:22px;cursor:pointer}
+@media(max-width:600px){
+ .hero h1{font-size:24px}
+ .service{display:block}
+ .service .btn{margin-top:12px;width:100%}
+ th,td{font-size:12px;padding:9px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">🚀 Akash SMM</div>
+  <div class="balance">₹<span id="balance">0.00</span></div>
+</header>
+
+<div class="container">
+
+<div class="hero">
+  <h1>Grow Your Social Media 🚀</h1>
+  <p>YouTube • Instagram • Facebook • Telegram</p>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h3>Wallet</h3>
+    <div class="stat">₹<span id="walletStat">0.00</span></div>
+  </div>
+  <div class="card">
+    <h3>Total Orders</h3>
+    <div class="stat" id="orderStat">0</div>
+  </div>
+  <div class="card">
+    <h3>Services</h3>
+    <div class="stat">12+</div>
+  </div>
+</div>
+
+<div class="tabs">
+<button class="active" onclick="showSection('services',this)">🛒 Services</button>
+<button onclick="showSection('order',this)">➕ New Order</button>
+<button onclick="showSection('orders',this)">📋 Orders</button>
+<button onclick="showSection('wallet',this)">💰 Wallet</button>
+<button onclick="showSection('account',this)">👤 Account</button>
+</div>
+
+<!-- SERVICES -->
+<div id="services" class="section active">
+  <div id="serviceList"></div>
+</div>
+
+<!-- ORDER -->
+<div id="order" class="section">
+<div class="form">
+<h2>➕ Place New Order</h2><br>
+
+<label>Service</label>
+<select id="serviceSelect"></select>
+
+<label>Link</label>
+<input id="link" placeholder="https://youtube.com/...">
+
+<label>Quantity</label>
+<input id="quantity" type="number" value="1000" min="100">
+
+<p style="margin-bottom:15px">
+Price: <b>₹<span id="price">0.00</span></b>
+</p>
+
+<button class="btn" style="width:100%" onclick="placeOrder()">
+Place Order
+</button>
+</div>
+</div>
+
+<!-- ORDERS -->
+<div id="orders" class="section">
+<div class="card" style="padding:0;overflow:auto">
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Service</th>
+<th>Quantity</th>
+<th>Charge</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody id="orderTable"></tbody>
+</table>
+</div>
+</div>
+
+<!-- WALLET -->
+<div id="wallet" class="section">
+<div class="form">
+<h2>💰 Wallet</h2><br>
+<h3>Current Balance: ₹<span id="walletBig">0.00</span></h3>
+<br>
+<label>Add Demo Funds</label>
+<input id="fundAmount" type="number" placeholder="Enter amount">
+<button class="btn green" onclick="addFunds()">Add Funds</button>
+<p style="margin-top:15px;color:#888;font-size:13px">
+Demo only — no real payment is processed.
+</p>
+</div>
+</div>
+
+<!-- ACCOUNT -->
+<div id="account" class="section">
+<div class="form">
+<h2>👤 Account</h2><br>
+
+<label>Name</label>
+<input id="userName" placeholder="Your name">
+
+<label>Email</label>
+<input id="userEmail" placeholder="Email">
+
+<button class="btn" onclick="saveAccount()">Save Profile</button>
+
+<br><br>
+<button class="btn red" onclick="resetDemo()">Reset Demo Data</button>
+</div>
+</div>
+
+</div>
+
+<footer>
+© 2026 Akash SMM Panel • Demo Website
+</footer>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+<div class="modal-box">
+<span class="close" onclick="closeModal()">×</span>
+<h2 id="modalTitle">Order</h2><br>
+<p id="modalText"></p>
+<br>
+<button class="btn" onclick="closeModal()">OK</button>
+</div>
+</div>
+
+<script>
+
+const services=[
+ {id:1,name:"YouTube Views",platform:"YouTube",price:.80,unit:"1000"},
+ {id:2,name:"YouTube Likes",platform:"YouTube",price:2.50,unit:"1000"},
+ {id:3,name:"YouTube Subscribers",platform:"YouTube",price:35,unit:"1000"},
+ {id:4,name:"Instagram Followers",platform:"Instagram",price:18,unit:"1000"},
+ {id:5,name:"Instagram Likes",platform:"Instagram",price:2,unit:"1000"},
+ {id:6,name:"Instagram Views",platform:"Instagram",price:.70,unit:"1000"},
+ {id:7,name:"Facebook Likes",platform:"Facebook",price:3,unit:"1000"},
+ {id:8,name:"Facebook Followers",platform:"Facebook",price:15,unit:"1000"},
+ {id:9,name:"Telegram Members",platform:"Telegram",price:20,unit:"1000"},
+ {id:10,name:"Telegram Views",platform:"Telegram",price:2,unit:"1000"},
+ {id:11,name:"YouTube Comments",platform:"YouTube",price:8,unit:"1000"},
+ {id:12,name:"Instagram Comments",platform:"Instagram",price:7,unit:"1000"}
+];
+
+let balance=Number(localStorage.getItem("balance")||0);
+let orders=JSON.parse(localStorage.getItem("orders")||"[]");
+let account=JSON.parse(localStorage.getItem("account")||"{}");
+
+function money(n){
+ return Number(n).toFixed(2);
+}
+
+function updateUI(){
+ document.getElementById("balance").textContent=money(balance);
+ document.getElementById("walletStat").textContent=money(balance);
+ document.getElementById("walletBig").textContent=money(balance);
+ document.getElementById("orderStat").textContent=orders.length;
+
+ localStorage.setItem("balance",balance);
+ localStorage.setItem("orders",JSON.stringify(orders));
+
+ renderOrders();
+}
+
+function renderServices(){
+ const box=document.getElementById("serviceList");
+ const select=document
